@@ -88,8 +88,10 @@ export default class {
   handleEditTicket(e, bill, bills) {
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
-    if (this.counter % 2 === 0) {
+    // Ouverture du ticket avec changement de bg
+    if (this.counter % 2 === 0 || bill.id) {
       bills.forEach(b => {
+        console.log('bouton cliqué');
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
@@ -131,6 +133,7 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
+    console.log('action deplier');
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
@@ -144,10 +147,10 @@ export default class {
         .html("")
       this.counter ++
     }
-
+// appel fonction handleEditTicket lorsque l'on clique sur un ticket
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-    })
+  })
 
     return bills
 
