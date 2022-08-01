@@ -2,13 +2,14 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor} from "@testing-library/dom"
+import {fireEvent, screen, waitFor} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH} from "../constants/routes.js";
+import { ROUTES, ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
-
 import router from "../app/Router.js";
+import Bills from "../containers/Bills.js";
+
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -39,4 +40,82 @@ describe("Given I am connected as an employee", () => {
       expect(dates).toEqual(datesSorted)
     })
   })
+
+  describe('When I click on "Nouvelle note de frais"', () => {
+    test("Then It should renders new Bill page", () => {
+      // j'initialise
+      // const onNavigate = (pathname) => {
+      //   document.body.innerHTML = ROUTES({ pathname })
+      // }
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      // Je selectionne mon bouton a tester
+      const buttonNewBill = screen.getByTestId("btn-new-bill")
+      // Je selectionne ma fonction
+      const handleClickNewBill = jest.fn( window.onNavigate(ROUTES_PATH['NewBill']))
+      // Je test mon bouton
+      expect(buttonNewBill).toBeTruthy()
+      // J'ajoute l'evenement au bouton
+      buttonNewBill.addEventListener('click', handleClickNewBill)
+      
+      // Je simule le click qui déclenche l'évenement
+      fireEvent.click(buttonNewBill)
+      // Je récupère le text de la page suivante pour controller qu'elle a bien été reçu
+      expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
+      expect(screen.getByText('Type de dépense')).toBeTruthy()
+    
+    })
+  })
+
+// Ajout chargement
+  describe('When I am on Bills page but it is loading', () => {
+    test('Then, Loading page should be rendered', () => {
+      document.body.innerHTML = BillsUI({ loading: true })
+      expect(screen.getAllByText('Loading...')).toBeTruthy()
+    })
+  })
+// Ajout error
+  describe('When I am on Bills page but back-end send an error message', () => {
+    test('Then, Error page should be rendered', () => {
+      document.body.innerHTML = BillsUI({ error: 'some error message' })
+      expect(screen.getAllByText('Erreur')).toBeTruthy()
+    })
+  })
+
+
+  describe("When I click on icon-eyes", () => {
+    test('Then A modale should open', () => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      $.fn.modal = jest.fn() // Correction erreur modal is not a fonction
+      document.body.innerHTML = BillsUI({ data: bills })
+      console.log(BillsUI);
+       const billsList = new Bills({
+        document,
+        store: null,
+        onNavigate : (pathname) => 
+          document.body.innerHTML = ROUTES({ pathname }),
+           localStorage: window.localStorage
+      })
+      const eye = screen.getAllByTestId('icon-eye')[0]
+      console.log('+++++++++++++++++++++++++++++++++++++');
+      console.log(eye);
+      const handleClickIconEye = jest.fn(billsList.handleClickIconEye(eye))
+      eye.addEventListener('click', handleClickIconEye)
+      fireEvent.click(eye)
+      
+      expect(handleClickIconEye).toHaveBeenCalled()
+      expect(screen.getByTestId('modaleFile')).toBeTruthy()
+
+    })
+  })
 })
+
