@@ -24,7 +24,7 @@ export default class NewBill {
       alert("Le fichier n'est pas au bon format. \n Veuillez sélectionner un fichier au format jpeg, png ou jpg.")
       return false
     }
-    else{
+    else if( /\.(jpe?g|png|jpg)$/i.test(fileName) === true ){
       console.log('le format est correct')
       return true
   }}
@@ -94,6 +94,7 @@ export default class NewBill {
         }
   }
 
+  /* istanbul ignore next */
   // not need to cover this function by tests
   updateBill = (bill) => {
     if (this.store && this.testValid === true) {

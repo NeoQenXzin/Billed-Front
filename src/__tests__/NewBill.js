@@ -5,24 +5,15 @@
 import { fireEvent, getByTestId, screen, waitFor, toContainHTML } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
+import store from "../__mocks__/store.js"
+import mockStore from '../__mocks__/store'
 
-import { formatDate } from "../app/format.js"
+import { ROUTES, ROUTES_PATH} from "../constants/routes.js";
+import BillsUI from "../views/BillsUI.js"
+import {localStorageMock} from "../__mocks__/localStorage.js";
+import router from "../app/Router.js";
 
-const bill = {
-  "id": "47qAXb6fIm2zOKkLzMro",
-  "vat": "80",
-  "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-  "status": "accepted",
-  "type": "Hôtel et logement",
-  "commentAdmin": "ok",
-  "commentary": "séminaire billed",
-  "name": "encore",
-  "fileName": "preview-facture-free-201801-pdf-1.jpg",
-  "date": "2004-04-04",
-  "amount": 400,
-  "email": "a@a",
-  "pct": 20
-}
+
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
@@ -73,31 +64,112 @@ describe("Given I am connected as an employee", () => {
       expect(HandleChangeFile).toHaveBeenCalled()
       expect(inputFile.files[0].name).toBe("fileTest.png")
       
-      const verifFileExtension = newBill.verifFileExtension(inputFile.files[0].name)
-      expect(verifFileExtension).toBeTruthy()
-      const verifFileExtension1 = newBill.verifFileExtension(inputFile.files[1].name)
-      expect(verifFileExtension1).toBeFalsy()
-      
-      console.log(verifFileExtension)
-      
+      const verifFileExtension1 = newBill.verifFileExtension(inputFile.files[0].name)
+      expect(verifFileExtension1).toBeTruthy()
+      const verifFileExtension2 = newBill.verifFileExtension(inputFile.files[1].name)
+      expect(verifFileExtension2).toBeFalsy()
+
     })
   })
   describe('When I submit the form', () => {
-    test("Then submit the form create a new bill", () => {
+    test("Then submit the form call the fonction to create a new bill", () => {
       const newBillForm = screen.getByTestId('form-new-bill')
       const handleSubmit = jest.fn(newBill.handleSubmit)
       newBillForm.addEventListener('submit', handleSubmit)
       fireEvent.submit(newBillForm)
       expect(handleSubmit).toHaveBeenCalled()
-
     })
   })
 
-  describe("When I create a new bill", () => {
-    test("", ( )=> {
-
-    })
-  })
   
-})
-})
+  // Test Post integration
+  describe("When I post a new bill ", () => {
+    beforeEach(() => {
+      jest.spyOn(mockStore, "bills")
+      Object.defineProperty(
+          window,
+          'localStorage',
+          { value: localStorageMock }
+      )
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee',
+        email: "a@a"
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.appendChild(root)
+      router()
+    })
+
+    
+    test("Update bills redirect to Bills route", async ( )=> {
+    
+      const request2 = await store.bills().update()
+      window.onNavigate(ROUTES_PATH.Bills)
+      // const message = await screen.getByText("Mes notes de frais")
+      // expect(message).toBeTruthy()
+      
+    })
+    
+  })
+    test("post bills from mock API POST", async ( )=> {
+     
+      const bill = {
+        "id": "47qAXb6fIm2zOKkLzMro",
+        "vat": "80",
+        "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+        "status": "accepted",
+        "type": "Hôtel et logement",
+        "commentAdmin": "ok",
+        "commentary": "séminaire billed",
+        "name": "encore",
+        "fileName": "preview-facture-free-201801-pdf-1.jpg",
+        "date": "2004-04-04",
+        "amount": 400,
+        "email": "a@a",
+        "pct": 20
+      }
+      
+      
+      
+      
+      const request = await store.bills().post(bill)
+      expect(request.status).toBe(200)
+      
+    })
+    
+  })
+  test("post bill from mock API and fails with 404 message error", async () => {
+   
+    jest.mock("../app/store", () => mockStore)
+
+    mockStore.bills.mockImplementationOnce(() => {
+      return {
+        post : () =>  {
+          return Promise.reject(new Error("Erreur 404"))
+        }
+      }})
+      
+      const html = BillsUI({error:"Erreur 404"})
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
+  })
+
+  test("post bill from mock API and fails with 500 message error", async () => {
+
+    mockStore.bills.mockImplementationOnce(() => {
+      return {
+        update : (bill) =>  {
+          return Promise.reject(new Error("Erreur 500"))
+        }
+      }})
+    const html = BillsUI({error:"Erreur 500"})
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
+  })
+  })
+
+  
+

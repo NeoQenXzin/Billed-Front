@@ -35,11 +35,11 @@ describe("Given I am connected as an employee", () => {
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
       // const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
-      const dates = bills.sort((a, b) => ((a.date < b.date) ? 1 : -1)).map(bill => bill.date)
+      const dates = bills.map(bill => bill.date)
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
-      console.debug(dates)
+      // console.debug(dates)
       const datesSorted = [...dates].sort(antiChrono)
-      console.log(datesSorted);
+      // console.log(datesSorted);
       expect(dates).toEqual(datesSorted)
     })
   })
@@ -136,8 +136,10 @@ describe("Given I am a user connected as Employee", () => {
       await waitFor(() => screen.getByText("Mes notes de frais"))
       const contentStatut  = await screen.getByText("Statut")
       expect(contentStatut).toBeTruthy()
-  
+      const billsRaws  = await screen.getByTestId("tbody")
+      expect(billsRaws).toBeTruthy()
     })
+   
   describe("When an error occurs on API", () => {
     beforeEach(() => {
       jest.spyOn(mockStore, "bills")
@@ -155,7 +157,14 @@ describe("Given I am a user connected as Employee", () => {
       document.body.appendChild(root)
       router()
     })
+
     test("fetches bills from an API and fails with 404 message error", async () => {
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 404"))
+          }
+        }})
 
       const html = BillsUI({error:"Erreur 404"})
         document.body.innerHTML = html
@@ -165,6 +174,12 @@ describe("Given I am a user connected as Employee", () => {
 
     test("fetches messages from an API and fails with 500 message error", async () => {
 
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 500"))
+          }
+        }})
       const html = BillsUI({error:"Erreur 500"})
         document.body.innerHTML = html
         const message = await screen.getByText(/Erreur 500/)
