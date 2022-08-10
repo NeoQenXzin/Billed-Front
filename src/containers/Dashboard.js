@@ -1,11 +1,7 @@
-import {
-  formatDate
-} from '../app/format.js'
+import { formatDate } from '../app/format.js'
 import DashboardFormUI from '../views/DashboardFormUI.js'
 import BigBilledIcon from '../assets/svg/big_billed.js'
-import {
-  ROUTES_PATH
-} from '../constants/routes.js'
+import { ROUTES_PATH } from '../constants/routes.js'
 import USERS_TEST from '../constants/usersTest.js'
 import Logout from "./Logout.js"
 
@@ -102,8 +98,6 @@ export default class {
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     // Ouverture du ticket avec changement de bg
-    console.log('ouvrir ticket', this.counter, this.counter % 2);
-    console.log('---------');
 
     if (this.counter % 2 === 0) {
       bills.forEach(b => {
@@ -121,8 +115,7 @@ export default class {
       this.counter++
 
     } else {
-      // console.log(this.counter);
-
+      
       $(`#open-bill${bill.id}`).css({
         background: '#0D5AE5'
       })
@@ -161,8 +154,6 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
-    // console.log(e);
-    // console.log(e.target);
     e.preventDefault()
     if (this.count === undefined || this.index !== index) this.count = 0
     if (this.index === undefined || this.index !== index) this.index = index
@@ -189,35 +180,7 @@ export default class {
     return bills
 
   }
-  // handleShowTickets(e, bills, index) {
-  // Pourquoi ne marche pas!!?
-  //   let arrowButton = document.querySelector('#arrow-icon' + index)
-  //   if (this.index === undefined || this.index !== index) this.index = index
-
-  //     if (arrowButton.style.transform === 'rotate(90deg)') {
-  //       console.log(this.index);
-  //     $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
-  //     $(`#status-bills-container${this.index}`)
-  //       .html(cards(filteredBills(bills, getStatus(this.index))))
-
-  //     } else {
-  //       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
-  //       $(`#status-bills-container${this.index}`)
-  //       .html("")
-  //       console.log(this.index);
-
-
-  //     }
-
-  //   // appel fonction handleEditTicket lorsque l'on clique sur un ticket
-  //   bills.forEach(bill => {
-  //     $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-  //   })
-
-  //   return bills
-
-  // }
-
+ 
   getBillsAllUsers = () => {
     if (this.store) {
       return this.store

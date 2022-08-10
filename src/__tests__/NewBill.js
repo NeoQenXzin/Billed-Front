@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { fireEvent, getByTestId, screen, waitFor, toContainHTML } from "@testing-library/dom"
+import { fireEvent, getByTestId, screen } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import store from "../__mocks__/store.js"
@@ -32,7 +32,7 @@ describe("Given I am connected as an employee", () => {
         })
       })
       
-    test("Then Title is 'Envoyer une note de frais'", () => {
+    test("Then, Title is 'Envoyer une note de frais' and all input are present", () => {
       // Je récupère le text de la page pour controller qu'elle a bien été reçu
       expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
       expect(screen.getByText('Type de dépense')).toBeTruthy()
@@ -49,7 +49,7 @@ describe("Given I am connected as an employee", () => {
     
   
   describe('When I select a file', () => {
-    test("Then the input change", () => {
+    test("Then, the input change and the extension file is verified ", () => {
       // Configurer un mail pour entrer dans un compte utilisateur
       localStorage.setItem("user", JSON.stringify({ type: "Employee", email: "a@a" })); 
       const inputFile = screen.getByTestId('file')
@@ -72,7 +72,7 @@ describe("Given I am connected as an employee", () => {
     })
   })
   describe('When I submit the form', () => {
-    test("Then submit the form call the fonction to create a new bill", () => {
+    test("Then, submit the form call the fonction to create a new bill", () => {
       const newBillForm = screen.getByTestId('form-new-bill')
       const handleSubmit = jest.fn(newBill.handleSubmit)
       newBillForm.addEventListener('submit', handleSubmit)
@@ -102,50 +102,20 @@ describe("Given I am connected as an employee", () => {
     })
 
     
-    test("Update bills redirect to Bills route", async ( )=> {
-    
-      const request2 = await store.bills().update()
-      window.onNavigate(ROUTES_PATH.Bills)
-      // const message = await screen.getByText("Mes notes de frais")
-      // expect(message).toBeTruthy()
+    test("Then, a bill is create", async () => {
+      
+      const request = await store.bills().update()
+      expect(request.type).toBe("Hôtel et logement")
       
     })
-    
-  })
-    test("post bills from mock API POST", async ( )=> {
-     
-      const bill = {
-        "id": "47qAXb6fIm2zOKkLzMro",
-        "vat": "80",
-        "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-        "status": "accepted",
-        "type": "Hôtel et logement",
-        "commentAdmin": "ok",
-        "commentary": "séminaire billed",
-        "name": "encore",
-        "fileName": "preview-facture-free-201801-pdf-1.jpg",
-        "date": "2004-04-04",
-        "amount": 400,
-        "email": "a@a",
-        "pct": 20
-      }
-      
-      
-      
-      
-      const request = await store.bills().post(bill)
-      expect(request.status).toBe(200)
-      
-    })
-    
   })
   test("post bill from mock API and fails with 404 message error", async () => {
-   
+    
     jest.mock("../app/store", () => mockStore)
 
     mockStore.bills.mockImplementationOnce(() => {
       return {
-        post : () =>  {
+        create : (bill) =>  {
           return Promise.reject(new Error("Erreur 404"))
         }
       }})
@@ -160,7 +130,7 @@ describe("Given I am connected as an employee", () => {
 
     mockStore.bills.mockImplementationOnce(() => {
       return {
-        update : (bill) =>  {
+        create : (bill) =>  {
           return Promise.reject(new Error("Erreur 500"))
         }
       }})
@@ -170,6 +140,8 @@ describe("Given I am connected as an employee", () => {
       expect(message).toBeTruthy()
   })
   })
+})
 
   
 
+  

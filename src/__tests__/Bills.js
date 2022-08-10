@@ -34,12 +34,9 @@ describe("Given I am connected as an employee", () => {
     })
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
-      // const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
       const dates = bills.map(bill => bill.date)
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
-      // console.debug(dates)
       const datesSorted = [...dates].sort(antiChrono)
-      // console.log(datesSorted);
       expect(dates).toEqual(datesSorted)
     })
   })
@@ -47,9 +44,6 @@ describe("Given I am connected as an employee", () => {
   describe('When I click on "Nouvelle note de frais"', () => {
     test("Then It should renders new Bill page", () => {
       // j'initialise
-      // const onNavigate = (pathname) => {
-      //   document.body.innerHTML = ROUTES({ pathname })
-      // }
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -93,7 +87,7 @@ describe("Given I am connected as an employee", () => {
 
 
   describe("When I click on icon-eyes", () => {
-    test('Then A modale should open', () => {
+    test('Then, A modale should open', () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -109,15 +103,12 @@ describe("Given I am connected as an employee", () => {
         localStorage: window.localStorage
       })
       const eye = screen.getAllByTestId('icon-eye')[0] // Je selectionne 1 seul icone
-      console.log('+++++++++++++++++++++++++++++++++++++');
-      // console.log(eye);
       const handleClickIconEye = jest.fn(billsList.handleClickIconEye(eye))
       eye.addEventListener('click', handleClickIconEye)
       userEvent.click(eye)
       
       expect(handleClickIconEye).toHaveBeenCalled()
       expect(screen.getByTestId('modaleFile')).toBeTruthy()
-      
     })
   })
 })
@@ -167,9 +158,9 @@ describe("Given I am a user connected as Employee", () => {
         }})
 
       const html = BillsUI({error:"Erreur 404"})
-        document.body.innerHTML = html
-        const message = await screen.getByText(/Erreur 404/)
-        expect(message).toBeTruthy()
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
     })
 
     test("fetches messages from an API and fails with 500 message error", async () => {
@@ -181,9 +172,9 @@ describe("Given I am a user connected as Employee", () => {
           }
         }})
       const html = BillsUI({error:"Erreur 500"})
-        document.body.innerHTML = html
-        const message = await screen.getByText(/Erreur 500/)
-        expect(message).toBeTruthy()
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
     })
   })
 

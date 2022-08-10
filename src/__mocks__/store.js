@@ -81,20 +81,9 @@ const mockedBills = {
       "email": "a@a",
       "pct": 20
     })
-  },
-  post: (bill) => {
-    if(bill){
-  
-      return Promise.resolve({
-        status: 200
-      })
-    } else{
-      return Promise.reject(
-        {error}
-      )
-    }
   }
-}
+  }
+
 
 export default {
   bills() {

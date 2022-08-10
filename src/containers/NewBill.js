@@ -20,12 +20,10 @@ export default class NewBill {
   // Test extension de fichier
     verifFileExtension(fileName){
     if( /\.(jpe?g|png|jpg)$/i.test(fileName) === false ) { 
-      console.log('le format est incorrect')
       alert("Le fichier n'est pas au bon format. \n Veuillez sélectionner un fichier au format jpeg, png ou jpg.")
       return false
     }
     else if( /\.(jpe?g|png|jpg)$/i.test(fileName) === true ){
-      console.log('le format est correct')
       return true
   }}
   //
@@ -38,7 +36,6 @@ export default class NewBill {
     const fileName = filePath[filePath.length-1]
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
-    console.log(fileName);
     
     if(this.verifFileExtension(fileName) === true){
       this.testValid = true
@@ -54,7 +51,6 @@ export default class NewBill {
             }
           })
           .then(({fileUrl, key}) => {
-            console.log(fileUrl)
             this.billId = key
             this.fileUrl = fileUrl
             this.fileName = fileName
@@ -71,7 +67,6 @@ export default class NewBill {
         e.preventDefault()
         if(this.testValid === true){
           
-          console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
           const email = JSON.parse(localStorage.getItem("user")).email
           const bill = {
             email,
