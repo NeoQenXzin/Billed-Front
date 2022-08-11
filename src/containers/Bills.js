@@ -35,13 +35,14 @@ export default class {
       .list()
       .then(snapshot => {
         const bills = snapshot
-          .map(doc => {
-            try {
-              return {
-                ...doc,
-                date: formatDate(doc.date),
-                status: formatStatus(doc.status)
-              }
+        .map(doc => {
+          try {
+            return {
+              ...doc,
+              date: formatDate(doc.date),
+              status: formatStatus(doc.status)
+            }
+            .sort((a, b) => ((a.date < b.date) ? 1 : -1))
             } catch(e) {
               // if for some reason, corrupted data was introduced, we manage here failing formatDate function
               // log the error and return unformatted date in that case
