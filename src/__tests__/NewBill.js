@@ -7,7 +7,6 @@ import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import store from "../__mocks__/store.js"
 import mockStore from '../__mocks__/store'
-
 import { ROUTES, ROUTES_PATH} from "../constants/routes.js";
 import BillsUI from "../views/BillsUI.js"
 import {localStorageMock} from "../__mocks__/localStorage.js";
@@ -25,7 +24,7 @@ describe("Given I am connected as an employee", () => {
       newBill = new NewBill(
         {
           document,
-          store: null,
+          store: store,
           onNavigate : (pathname) => 
           document.body.innerHTML = ROUTES({ pathname }),
           localStorage: window.localStorage
@@ -49,10 +48,10 @@ describe("Given I am connected as an employee", () => {
     
   
   describe('When I select a file', () => {
-    test("Then, the input change and the extension file is verified ", () => {
+    test("Then, the input change and the extension file is verified ", async () => {
       // Configurer un mail pour entrer dans un compte utilisateur
       localStorage.setItem("user", JSON.stringify({ type: "Employee", email: "a@a" })); 
-      const inputFile = screen.getByTestId('file')
+      const inputFile =  screen.getByTestId('file')
       const HandleChangeFile = jest.fn(newBill.HandleChangeFile)
       inputFile.addEventListener('change', HandleChangeFile)
       fireEvent.change(inputFile, {
@@ -63,11 +62,6 @@ describe("Given I am connected as an employee", () => {
       })
       expect(HandleChangeFile).toHaveBeenCalled()
       expect(inputFile.files[0].name).toBe("fileTest.png")
-      
-      const verifFileExtension1 = newBill.verifFileExtension(inputFile.files[0].name)
-      expect(verifFileExtension1).toBeTruthy()
-      const verifFileExtension2 = newBill.verifFileExtension(inputFile.files[1].name)
-      expect(verifFileExtension2).toBeFalsy()
 
     })
   })
@@ -81,7 +75,6 @@ describe("Given I am connected as an employee", () => {
     })
   })
 
-  
   // Test Post integration
   describe("When I post a new bill ", () => {
     beforeEach(() => {
