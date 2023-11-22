@@ -1,3 +1,8 @@
+# 🎓 p9 ocr
+## Tester et Debugger une application Js
+
+
+![image](https://github.com/NeoQenXzin/Billed-Front/assets/66415285/99f78785-cd0a-4302-8317-6beb2b4642a3)
 
 ## L'architecture du projet :
 Ce projet, dit frontend, est connecté à un service API backend que vous devez aussi lancer en local.
